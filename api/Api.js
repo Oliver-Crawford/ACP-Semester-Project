@@ -4,7 +4,9 @@ var mysql = require('mysql');
 app.use(express.json());
 var dbName = "OliverSemesterProjectDb";
 var tableProducts = `${dbName}.products`;
-var tableStaff = `${dbName}.staff`
+var tableStaff = `${dbName}.staff`;
+var tableOrders = `${dbName}.orders`;
+var tableOrderItems = `${dbName}.orderitems`;
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -196,7 +198,6 @@ app.get('/DeleteStaff/:id', (req, res) =>{
     });
 });
 
-
 function testId(id){
     if(id == null || isNaN(parseInt(id))){
         return false;
@@ -220,6 +221,18 @@ var server = app.listen(8080, () =>{
     managerId int not null
     active bool not null
     foreign key(managerId) references ${tableStaff}(id)
+    
+    orders
+    id int not null primary key auto_increment
+    total decimal(10, 2) not null
+
+    orderItems
+    id int not null primary key auto_increment
+    itemId int not null
+    amount int not null
+    orderId int not null
+    foreign key(orderId) references ${tableOrders}(id)
+    foreign key(itemId) references ${tableProducts}(id)
     */
 
     var createDbQuery = `CREATE DATABASE IF NOT EXISTS  ${dbName};`;
@@ -233,6 +246,16 @@ var server = app.listen(8080, () =>{
     var checkStaffTableQuery = `select * from ${tableStaff};`;
     var populateStaffTableQueryTemplate = `insert into ${tableStaff} (name, role, managerId, active) values ('`;
     var staffDefaults = require(__dirname+"\\files\\staffDefaults.json");
+
+    var createOrdersTableQuery = `create table if not exists ${tableOrders} (id int not null primary key auto_increment, total decimal(10, 2) not null);`;
+    var checkOrdersTableQuery = `select * from ${tableOrders};`;
+    var populateOrdersTableQueryTemplate = `insert into ${tableOrders} (total) values (`;
+    var ordersDefault = require(__dirname+"\\files\\ordersDefaults.json");
+
+    var createOrderItemsTableQuery = `create table if not exists ${tableOrderItems} (id int not null primary key auto_increment, itemId int not null, amount int not null, orderId int not null, foreign key(orderId) references ${tableOrders}(id), foreign key(itemId) references ${tableProducts}(id));`;
+    var checkOrderItemsTableQuery = `select * from ${tableOrderItems}`;
+    var populateOrderItemsTableQueryTemplate = `insert into ${tableOrderItems} (itemId, amount, orderId) values (`;
+    var orderItemsDefault = require(__dirname+"\\files\\orderItemsDefaults.json");
 
     console.log('Node server booting up\ndoing initial configs/checks');
     con.query(createDbQuery, (err, result)=>{
@@ -256,6 +279,7 @@ var server = app.listen(8080, () =>{
                 }
             });
         });
+
         con.query(createStaffTableQuery, (err, result) =>{
             if(err) throw err;
             console.log(`${tableStaff} Exists!`);
@@ -274,5 +298,44 @@ var server = app.listen(8080, () =>{
                 }
             });
         });
+
+        con.query(createOrdersTableQuery, (err, result) =>{
+            if(err) throw err;
+            console.log(`${tableOrders} Exists!`);
+            con.query(checkOrdersTableQuery, (err, result) =>{
+                if(err) throw err;
+                if(result.length == 0){
+                    ordersDefault.defaultRows.forEach((item) => {
+                        var populateOrdersTableQuery = populateOrdersTableQueryTemplate + item.total + ");";
+                        con.query(populateOrdersTableQuery, (err, result) =>{
+                            if(err) throw err;
+                            console.log(`Created the a new row in ${tableOrders}!`);
+                        });
+                    });
+                } else {
+                    console.log(`Rows already existed in ${tableOrders}`);
+                }
+            });
+        });
+
+        con.query(createOrderItemsTableQuery, (err, result) =>{
+            if(err) throw err;
+            console.log(`${tableOrderItems} Exists!`);
+            con.query(checkOrderItemsTableQuery, (err, result) =>{
+                if(err) throw err;
+                if(result.length == 0){
+                    orderItemsDefault.defaultRows.forEach((item) => {
+                        var populateOrderItemsTableQuery = populateOrderItemsTableQueryTemplate + item.itemId + ", " + item.amount + ", " + item.orderId + ");";
+                        con.query(populateOrderItemsTableQuery, (err, result) =>{
+                            if(err) throw err;
+                            console.log(`Created the a new row in ${tableOrderItems}!`);
+                        });
+                    });
+                } else {
+                    console.log(`Rows already existed in ${tableOrderItems}`);
+                }
+            });
+        });
+
     });
 });
