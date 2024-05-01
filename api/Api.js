@@ -47,11 +47,7 @@ app.get('/GetProductById/:id', (req, res) =>{
         return 0;
     }
     var id = parseInt(req.params.id);
-    const selectQuery = `select * from ${tableProducts} where id=${id};`;
-    con.query(selectQuery, (err, result) =>{
-        if(err) throw err;
-        res.send(result);
-    });
+    res.send(selectByIdQuery(tableProducts, id));
 
     
 });
@@ -133,13 +129,7 @@ app.get('/GetStaffById/:id', (req, res) =>{
         return 0;
     }
     var id = parseInt(req.params.id);
-    const selectQuery = `select * from ${tableStaff} where id=${id};`;
-    con.query(selectQuery, (err, result) =>{
-        if(err) throw err;
-        res.send(result);
-    });
-
-    
+    res.send(selectByIdQuery(tableStaff, id));
 });
 
 app.get('/PatchStaff', (req, res) =>{
@@ -220,13 +210,8 @@ app.get('/GetOrdersById/:id', (req, res) =>{
         return 0;
     }
     var id = parseInt(req.params.id);
-    const selectQuery = `select * from ${tableOrders} where id=${id};`;
-    con.query(selectQuery, (err, result) =>{
-        if(err) throw err;
-        res.send(result);
-    });
+    res.send(selectByIdQuery(tableOrders, id));
 
-    
 });
 
 app.get('/PatchOrders', (req, res) =>{
@@ -265,6 +250,89 @@ app.get('/DeleteOrders/:id', (req, res) =>{
         res.send(result);
     });
 });
+
+app.get('/PostOrderItems', (req, res) =>{
+    const insertQuery = `insert into ${tableOrderItems} (itemId, amount, orderId) values (${req.body.itemId}, ${req.body.amount}, ${req.body.orderId});`;
+    con.query(insertQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+app.get('/GetAllOrderItems', (req, res) =>{
+    const selectQuery = `select * from ${tableOrderItems};`;
+    con.query(selectQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+app.get('/GetOrderItemsById/:id', (req, res) =>{
+    if(!testId(req.params.id)){
+        res.send(`Must include an id, ${req.params.id} is not an id.`);
+        return 0;
+    }
+    var id = parseInt(req.params.id);
+    res.send(selectByIdQuery(tableOrderItems, id));
+});
+
+app.get('/PatchOrderItems', (req, res) =>{
+    if(!testId(req.body.id)){
+        res.send(`Must include an id, ${req.body.id} is not an id.`);
+        return 0;
+    }
+
+    var updateQuery = `update ${tableOrderItems} set `;
+    var idValue = parseInt(req.body.id);
+    var updated = false;
+
+    if(req.body.itemId != null && !isNaN(parseInt(req.body.itemId))){
+        updateQuery += `itemId = '${req.body.itemId}'`;
+        updated = true;
+    }
+
+    if(req.body.amount != null && !isNaN(parseInt(req.body.amount))){
+        if(updated) updateQuery += ", ";
+        updateQuery += `amount = ${req.body.amount}`;
+        updated = true;
+    }
+
+    if(req.body.orderId != null && !isNaN(parseInt(req.body.orderId))){
+        if(updated) updateQuery += ", ";
+        updateQuery += `amount = ${req.body.orderId}`;
+        updated = true;
+    }
+
+    if(!updated){
+        res.send("Must update a field");
+        return 0;
+    }
+    updateQuery += ` where id = ${idValue};`;
+    con.query(updateQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+app.get('/DeleteOrderItems/:id', (req, res) =>{
+    if(!testId(req.params.id)){
+        res.send(`Must include an id, ${req.params.id} is not an id.`);
+        return 0;
+    }
+    const deleteQuery = `delete from ${tableOrderItems} where id = ${req.params.id};`;
+    con.query(deleteQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+function selectByIdQuery(tableName, id){
+    const selectQuery = `select * from ${tableName} where id=${id};`;
+    con.query(selectQuery, (err, result) =>{
+        if(err) throw err;
+        return result;
+    });
+}
 
 function testId(id){
     if(id == null || isNaN(parseInt(id))){
