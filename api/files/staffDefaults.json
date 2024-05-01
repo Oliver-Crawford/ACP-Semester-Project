@@ -1,0 +1,34 @@
+{
+    "defaultRows":[
+        {
+            "name": "Boss mc Bossington",
+            "role": 0,
+            "managerId": 1,
+            "active": true
+        },
+        {
+            "name": "Manager 1",
+            "role": 1,
+            "managerId": 1,
+            "active": true
+        },
+        {
+            "name": "Staff 1",
+            "role": 2,
+            "managerId": 2,
+            "active": true
+        },
+        {
+            "name": "Staff 2",
+            "role": 2,
+            "managerId": 2,
+            "active": true
+        },
+        {
+            "name": "Staff 3",
+            "role": 2,
+            "managerId": 2,
+            "active": true
+        }
+    ]
+}

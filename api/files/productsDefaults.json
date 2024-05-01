@@ -1,0 +1,46 @@
+{
+    "defaultRows":[
+        {
+            "name": "Grape",
+            "description": "Green and ready to eat!",
+            "price": 2.50,
+            "image": "grape.png",
+            "amount": 10
+        },
+        {
+            "name": "Apple",
+            "description": "Red and Delicious.",
+            "price": 1.50,
+            "image": "apple.png",
+            "amount": 50
+        },
+        {
+            "name": "Tomato",
+            "description": "Bright red and fresh!",
+            "price": 1.00,
+            "image": "tomato.png",
+            "amount": 100
+        },
+        {
+            "name": "Potato",
+            "description": "Great in stews.",
+            "price": 1.00,
+            "image": "potato.png",
+            "amount": 125
+        },
+        {
+            "name": "Lemon",
+            "description": "For flavour.",
+            "price": 1.00,
+            "image": "lemon.png",
+            "amount": 37
+        },
+        {
+            "name": "Celery",
+            "description": "Its a veggie I guess.",
+            "price": 600.00,
+            "image": "celery.png",
+            "amount": 1
+        }
+    ]
+}
