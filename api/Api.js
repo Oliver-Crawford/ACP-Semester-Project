@@ -198,6 +198,74 @@ app.get('/DeleteStaff/:id', (req, res) =>{
     });
 });
 
+app.get('/PostOrders', (req, res) =>{
+    const insertQuery = `insert into ${tableOrders} (total) values (${req.body.total});`;
+    con.query(insertQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+app.get('/GetAllOrders', (req, res) =>{
+    const selectQuery = `select * from ${tableOrders};`;
+    con.query(selectQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+app.get('/GetOrdersById/:id', (req, res) =>{
+    if(!testId(req.params.id)){
+        res.send(`Must include an id, ${req.params.id} is not an id.`);
+        return 0;
+    }
+    var id = parseInt(req.params.id);
+    const selectQuery = `select * from ${tableOrders} where id=${id};`;
+    con.query(selectQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+
+    
+});
+
+app.get('/PatchOrders', (req, res) =>{
+    if(!testId(req.body.id)){
+        res.send(`Must include an id, ${req.body.id} is not an id.`);
+        return 0;
+    }
+    var updateQuery = `update ${tableOrders} set `;
+    var idValue = parseInt(req.body.id);
+    var updated = false;
+
+    if(req.body.total != null){
+        updateQuery += `total = ${req.body.total}`;
+        updated = true;
+    }
+
+    if(!updated){
+        res.send("Must update a field");
+        return 0;
+    }
+    updateQuery += ` where id = ${idValue};`;
+    con.query(updateQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
+app.get('/DeleteOrders/:id', (req, res) =>{
+    if(!testId(req.params.id)){
+        res.send(`Must include an id, ${req.params.id} is not an id.`);
+        return 0;
+    }
+    const deleteQuery = `delete from ${tableOrders} where id = ${req.params.id};`;
+    con.query(deleteQuery, (err, result) =>{
+        if(err) throw err;
+        res.send(result);
+    });
+});
+
 function testId(id){
     if(id == null || isNaN(parseInt(id))){
         return false;
