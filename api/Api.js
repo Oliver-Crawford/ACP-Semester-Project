@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var mysql = require('mysql');
+var util = require('util');
 app.use(express.json());
 var dbName = "OliverSemesterProjectDb";
 var tableProducts = `${dbName}.products`;
@@ -12,8 +13,12 @@ var con = mysql.createConnection({
     host: "localhost",
     user: "root",   
     port: 3306,
-    password: ""
+    password: "",
+    database: `${dbName}`
+
 });
+
+const query = util.promisify(con.query).bind(con);
 
 con.connect((err) =>{
     if (err) throw err;
@@ -41,15 +46,18 @@ app.get('/GetAllProducts', (req, res) =>{
     });
 });
 
-app.get('/GetProductById/:id', (req, res) =>{
+app.get('/GetProductById/:id', async (req, res) =>{
     if(!testId(req.params.id)){
         res.send(`Must include an id, ${req.params.id} is not an id.`);
         return 0;
     }
     var id = parseInt(req.params.id);
-    res.send(selectByIdQuery(tableProducts, id));
-
-    
+    try{
+        const data = await selectByIdQuery(tableProducts, id);
+        res.send(data);
+    }catch(e){
+        res.status(500).send("Error");
+    }
 });
 
 app.get('/PatchProducts', (req, res) =>{
@@ -123,13 +131,18 @@ app.get('/GetAllStaff', (req, res) =>{
     });
 });
 
-app.get('/GetStaffById/:id', (req, res) =>{
+app.get('/GetStaffById/:id', async(req, res) =>{
     if(!testId(req.params.id)){
         res.send(`Must include an id, ${req.params.id} is not an id.`);
         return 0;
     }
     var id = parseInt(req.params.id);
-    res.send(selectByIdQuery(tableStaff, id));
+    try{
+        const data = await selectByIdQuery(tableStaff, id);
+        res.send(data);
+    }catch(e){
+        res.status(500).send("Error");
+    }
 });
 
 app.get('/PatchStaff', (req, res) =>{
@@ -204,14 +217,18 @@ app.get('/GetAllOrders', (req, res) =>{
     });
 });
 
-app.get('/GetOrdersById/:id', (req, res) =>{
+app.get('/GetOrdersById/:id', async (req, res) =>{
     if(!testId(req.params.id)){
         res.send(`Must include an id, ${req.params.id} is not an id.`);
         return 0;
     }
     var id = parseInt(req.params.id);
-    res.send(selectByIdQuery(tableOrders, id));
-
+    try{
+        const data = await selectByIdQuery(tableOrders, id);
+        res.send(data);
+    }catch(e){
+        res.status(500).send("Error");
+    }
 });
 
 app.get('/PatchOrders', (req, res) =>{
@@ -267,13 +284,18 @@ app.get('/GetAllOrderItems', (req, res) =>{
     });
 });
 
-app.get('/GetOrderItemsById/:id', (req, res) =>{
+app.get('/GetOrderItemsById/:id', async (req, res) =>{
     if(!testId(req.params.id)){
         res.send(`Must include an id, ${req.params.id} is not an id.`);
         return 0;
     }
     var id = parseInt(req.params.id);
-    res.send(selectByIdQuery(tableOrderItems, id));
+    try{
+        const data = await selectByIdQuery(tableOrderItems, id);
+        res.send(data);
+    }catch(e){
+        res.status(500).send("Error");
+    }
 });
 
 app.get('/PatchOrderItems', (req, res) =>{
@@ -326,17 +348,32 @@ app.get('/DeleteOrderItems/:id', (req, res) =>{
     });
 });
 
-function selectByIdQuery(tableName, id){
+async function selectByIdQuery(tableName, id){
     const selectQuery = `select * from ${tableName} where id=${id};`;
+    try{
+        const rows = await query(selectQuery);
+        return rows;
+    }catch(e){
+        throw e;
+    }
+    /*
     con.query(selectQuery, (err, result) =>{
         if(err) throw err;
-        return result;
+        var out = new Promise((resolve, reject) =>{
+            setTimeout(() =>{
+                var data = result;
+                resolve(data);
+            }, 2000);
+        });
+        return out;
     });
+    */
+    
 }
 
-function testId(id){
+async function testId(id){
     if(id == null || isNaN(parseInt(id))){
-        return false;
+        return false
     }
     return true;
 }
