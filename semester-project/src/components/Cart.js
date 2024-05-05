@@ -9,7 +9,7 @@ const Cart = () => {
             setData(response.data);
         })
         .catch(err =>{
-            console.log("FAILURE");
+          console.log("GetAllProducts Failed\n"+err);
         });
     }, []);
     const handleClick = (event) => {
@@ -34,12 +34,6 @@ const Cart = () => {
     };
   return (
     <div className="Cart">
-      <nav className="navbar navbar-expand-sm bg-light justify-content-center">
-        <ul className="navbar-nav">
-          <a href="/Shop" className="btn btn-primary">Shop</a>
-          <a href="/Checkout" className="btn btn-primary">Checkout</a>
-        </ul>
-      </nav>
       {data
       .filter(item => {
         return parseInt(localStorage.getItem(item.id)) > 0;
@@ -53,9 +47,9 @@ const Cart = () => {
             <img src={"./images/"+item.image} alt={item.name} width="256" />
           </div>
           <div className="card-footer">
-          <div class="d-flex justify-content-around">
-            <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} data-state={true} class="btn btn-primary">Add</a>
-            <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} data-state={false} class="btn btn-primary">Remove</a>
+          <div className="d-flex justify-content-around">
+            <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} data-state={true} className="btn btn-primary">Add</a>
+            <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} data-state={false} className="btn btn-primary">Remove</a>
           </div>
             In Cart: {localStorage.getItem(item.id)}<br />
             {item.description}<br />

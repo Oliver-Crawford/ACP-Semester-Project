@@ -10,7 +10,7 @@ const Shop = () => {
             setData(response.data);
         })
         .catch(err =>{
-            console.log("FAILURE");
+            console.log("GetAllProducts Failed\n"+err);
         });
     }, []);
     const handleClick = (event) => {
@@ -29,11 +29,6 @@ const Shop = () => {
     };
     return(
         <div className="Shop">
-            <nav className="navbar navbar-expand-sm bg-light justify-content-around">
-                <ul className="navbar-nav">
-                    <a href="/Cart" className="btn btn-primary">Cart</a>
-                </ul>
-            </nav>
             {data.map(item => (
               <div key={item.id} className="card d-inline-flex">
                 <div className="card-header">
@@ -43,8 +38,8 @@ const Shop = () => {
                   <img src={"./images/"+item.image} alt={item.name} width="256" />
                 </div>
                 <div className="card-footer">
-                <div class="d-flex justify-content-around">
-                    <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} class="btn btn-primary">Order</a>
+                <div className="d-flex justify-content-around">
+                    <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} className="btn btn-primary">Order</a>
                 </div>
                 {item.description}<br />
                 ${item.price}<br />
