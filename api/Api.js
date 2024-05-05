@@ -2,12 +2,22 @@ var express = require('express');
 var app = express();
 var mysql = require('mysql');
 var util = require('util');
+var cors = require('cors');
 app.use(express.json());
 var dbName = "OliverSemesterProjectDb";
 var tableProducts = `${dbName}.products`;
 var tableStaff = `${dbName}.staff`;
 var tableOrders = `${dbName}.orders`;
 var tableOrderItems = `${dbName}.orderitems`;
+
+const corsOptions = {
+    origin: 'http://localhost', // Replace with your allowed origin
+    methods: ['GET', 'POST'], // Specify which HTTP methods are allowed
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11) choke on 204
+};
+
+app.use(cors(corsOptions));
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -39,6 +49,7 @@ app.get('/PostProducts', (req, res) =>{
 });
 
 app.get('/GetAllProducts', (req, res) =>{
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     const selectQuery = `select * from ${tableProducts};`;
     con.query(selectQuery, (err, result) =>{
         if(err) throw err;
