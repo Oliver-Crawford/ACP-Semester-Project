@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 
 
 const Shop = () => {
-    const [data, setData] = useState([]);
+    var [data, setData] = useState([]);
     useEffect(() =>{
-    axios.get('http://localhost:8080/GetAllProducts')
+        axios.get('http://localhost:8080/GetAllProducts')
         .then(response =>{
             setData(response.data);
         })
@@ -29,21 +29,23 @@ const Shop = () => {
     };
     return(
         <div className="Shop">
-            <nav class="navbar navbar-expand-sm bg-light justify-content-center">
-                <ul class="navbar-nav">
-                    <a href="/Cart" class="btn btn-primary">Cart</a>
+            <nav className="navbar navbar-expand-sm bg-light justify-content-around">
+                <ul className="navbar-nav">
+                    <a href="/Cart" className="btn btn-primary">Cart</a>
                 </ul>
             </nav>
             {data.map(item => (
-              <div key={item.id} class="card d-inline-flex">
-                <div class="card-header">
+              <div key={item.id} className="card d-inline-flex">
+                <div className="card-header">
                   {item.name}
                 </div>
-                <div class="card-body">
+                <div className="card-body">
                   <img src={"./images/"+item.image} alt={item.name} width="256" />
                 </div>
-                <div class="card-footer">
-                <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} class="btn btn-primary">Order</a><br/>
+                <div className="card-footer">
+                <div class="d-flex justify-content-around">
+                    <a href="#" onClick={handleClick} data-id={item.id} data-amount={item.amount} data-name={item.name} class="btn btn-primary">Order</a>
+                </div>
                 {item.description}<br />
                 ${item.price}<br />
                 Available: {item.amount}<br />

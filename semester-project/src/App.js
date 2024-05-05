@@ -14,6 +14,7 @@ function App() {
           <Route exact path="/" element={<Navigate to="/Shop" />} />
           <Route path="/Shop" element={<ShopPage />} />
           <Route path="/Cart" element={<CartPage />} />
+          <Route path="/Checkout" element={<CheckoutPage />} />
         </Routes>
       </BrowserRouter>
     </div>
