@@ -44,12 +44,13 @@ const Order = () => {
     }
     const postOrderItems = async(orderId) =>{
         console.log("OrderItems!");
-        await itemsEffected.forEach((key, value)=>{
+        await itemsEffected.forEach((value, key)=>{
             var returnInfo ={
                 itemId: key,
                 amount: value,
                 orderId: orderId
             }
+            console.log(returnInfo);
             axios.post(api+'PostOrderItems', returnInfo)
             .then(response =>{
                 return response;
@@ -61,13 +62,13 @@ const Order = () => {
     }
     const patchProducts = async(products) =>{
         console.log("patchProducts!");
-        
         await itemsEffected.forEach((value, key) =>{
-            var productsAmount = products[key] + value;
+            var productsAmount = products[key-1].amount - value;
             var returnInfo ={
                 id: key,
                 amount: productsAmount
             }
+            console.log(returnInfo + "\n" + products[key-1].amount);
             axios.post(api+'PatchProducts', returnInfo)
             .then(response =>{
                 return response;
@@ -91,9 +92,9 @@ const Order = () => {
                 var orders = await postOrders(products);
                 console.log(orders.data.insertId);
                 var OrderItems = await postOrderItems(orders.data.insertId);
-
+                console.log(OrderItems);
                 var patchProductsRes = await patchProducts(products);
-                
+                console.log(patchProductsRes);
                 localStorage.clear();
                 const timeout = setTimeout(() => {
                     navigate('/');
