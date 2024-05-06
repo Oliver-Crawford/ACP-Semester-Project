@@ -16,6 +16,12 @@ function App() {
           <a href="/Checkout" className="btn btn-primary">Checkout</a>
           <a href="/Cart" className="btn btn-primary">Cart</a>
       </nav>
+      {/* Dummy spacing buttons so that there's always space for the actual navbar at the top of the screen */}
+      <nav className="navbar navbar-expand-sm bg-light justify-content-around bg-light">
+          <a href="/Shop" className="btn btn-primary">Shop</a>
+          <a href="/Checkout" className="btn btn-primary">Checkout</a>
+          <a href="/Cart" className="btn btn-primary">Cart</a>
+      </nav>
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Navigate to="/Shop" />} />
