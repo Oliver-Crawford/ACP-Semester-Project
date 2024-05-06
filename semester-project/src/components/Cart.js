@@ -33,6 +33,9 @@ const Cart = () => {
           }
         } else{
           localStorage.setItem(id, --amount);
+          if(localStorage.getItem(id) == 0){
+            localStorage.removeItem(id);
+          }
           const timeout = setTimeout(() => {
             navigate('/Cart');
           }, 2000); 

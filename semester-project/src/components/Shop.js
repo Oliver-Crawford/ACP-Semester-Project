@@ -17,14 +17,13 @@ const Shop = () => {
         event.preventDefault();
         const id = event.target.dataset.id;
         const available = event.target.dataset.amount;
-        if(isNaN(parseInt(localStorage.getItem(id))) ){
-            localStorage.setItem(id, 0);
+        if(isNaN(parseInt(localStorage.getItem(id))) || localStorage.getItem(id) <= 0){
+            localStorage.setItem(id, 1);
         }
         var amount = parseInt(localStorage.getItem(id));
         if(amount >= available){
             alert(`not enough ${event.target.dataset.name}!`)
-        } else{
-            localStorage.setItem(id, ++amount);
+            localStorage.removeItem(id);
         }
     };
     return(
