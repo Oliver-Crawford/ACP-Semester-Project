@@ -94,6 +94,7 @@ const Order = () => {
 
                 var patchProductsRes = await patchProducts(products);
                 
+                localStorage.clear();
                 const timeout = setTimeout(() => {
                     navigate('/');
                 }, 2000); 
