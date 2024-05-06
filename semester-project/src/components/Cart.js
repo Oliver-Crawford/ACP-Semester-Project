@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 const Cart = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
     useEffect(() =>{
         axios.get('http://localhost:8080/GetAllProducts')
@@ -23,11 +26,17 @@ const Cart = () => {
             alert(`not enough ${event.target.dataset.name}!`)
           } else{
             localStorage.setItem(id, ++amount);
-            window.location.reload();
+            const timeout = setTimeout(() => {
+              navigate('/Cart');
+            }, 2000); 
+            return () => clearTimeout(timeout);
           }
         } else{
           localStorage.setItem(id, --amount);
-          window.location.reload();
+          const timeout = setTimeout(() => {
+            navigate('/Cart');
+          }, 2000); 
+          return () => clearTimeout(timeout);
         }
         
         
