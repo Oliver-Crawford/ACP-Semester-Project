@@ -11,13 +11,19 @@ var tableOrders = `${dbName}.orders`;
 var tableOrderItems = `${dbName}.orderitems`;
 
 const corsOptions = {
-    origin: 'http://localhost', // Replace with your allowed origin
+    origin: 'http://localhost:3000', // Replace with your allowed origin
     methods: ['GET', 'POST'], // Specify which HTTP methods are allowed
     allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
     optionsSuccessStatus: 200 // Some legacy browsers (IE11) choke on 204
 };
 
 app.use(cors(corsOptions));
+
+const setHeadersMiddleware = (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    next();
+};
+app.use(setHeadersMiddleware);
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -27,6 +33,8 @@ var con = mysql.createConnection({
     database: `${dbName}`
 
 });
+
+
 
 const query = util.promisify(con.query).bind(con);
 
@@ -40,7 +48,7 @@ app.get('/', (req, res) =>{
     res.sendFile(__dirname + '\\files\\index.html', );
 });
 
-app.get('/PostProducts', (req, res) =>{
+app.post('/PostProducts', (req, res) =>{
     const insertQuery = `insert into ${tableProducts} (name, description, price, image, amount) values ('${req.body.name}', '${req.body.description}', ${req.body.price}, '${req.body.image}', ${req.body.amount});`;
     con.query(insertQuery, (err, result) =>{
         if(err) throw err;
@@ -49,7 +57,7 @@ app.get('/PostProducts', (req, res) =>{
 });
 
 app.get('/GetAllProducts', (req, res) =>{
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    //res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     const selectQuery = `select * from ${tableProducts};`;
     con.query(selectQuery, (err, result) =>{
         if(err) throw err;
@@ -71,7 +79,7 @@ app.get('/GetProductById/:id', async (req, res) =>{
     }
 });
 
-app.get('/PatchProducts', (req, res) =>{
+app.post('/PatchProducts', (req, res) =>{
     if(!testId(req.body.id)){
         res.send(`Must include an id, ${req.body.id} is not an id.`);
         return 0;
@@ -126,7 +134,7 @@ app.get('/DeleteProducts/:id', (req, res) =>{
     });
 });
 
-app.get('/PostStaff', (req, res) =>{
+app.post('/PostStaff', (req, res) =>{
     const insertQuery = `insert into ${tableStaff} (name, role, managerId, active) values ('${req.body.name}', ${req.body.role}, ${req.body.managerId}, ${req.body.active});`;
     con.query(insertQuery, (err, result) =>{
         if(err) throw err;
@@ -156,7 +164,7 @@ app.get('/GetStaffById/:id', async(req, res) =>{
     }
 });
 
-app.get('/PatchStaff', (req, res) =>{
+app.post('/PatchStaff', (req, res) =>{
     if(!testId(req.body.id)){
         res.send(`Must include an id, ${req.body.id} is not an id.`);
         return 0;
@@ -212,7 +220,7 @@ app.get('/DeleteStaff/:id', (req, res) =>{
     });
 });
 
-app.get('/PostOrders', (req, res) =>{
+app.post('/PostOrders', (req, res) =>{
     const insertQuery = `insert into ${tableOrders} (total) values (${req.body.total});`;
     con.query(insertQuery, (err, result) =>{
         if(err) throw err;
@@ -242,7 +250,7 @@ app.get('/GetOrdersById/:id', async (req, res) =>{
     }
 });
 
-app.get('/PatchOrders', (req, res) =>{
+app.post('/PatchOrders', (req, res) =>{
     if(!testId(req.body.id)){
         res.send(`Must include an id, ${req.body.id} is not an id.`);
         return 0;
@@ -279,7 +287,7 @@ app.get('/DeleteOrders/:id', (req, res) =>{
     });
 });
 
-app.get('/PostOrderItems', (req, res) =>{
+app.post('/PostOrderItems', (req, res) =>{
     const insertQuery = `insert into ${tableOrderItems} (itemId, amount, orderId) values (${req.body.itemId}, ${req.body.amount}, ${req.body.orderId});`;
     con.query(insertQuery, (err, result) =>{
         if(err) throw err;
@@ -309,7 +317,7 @@ app.get('/GetOrderItemsById/:id', async (req, res) =>{
     }
 });
 
-app.get('/PatchOrderItems', (req, res) =>{
+app.post('/PatchOrderItems', (req, res) =>{
     if(!testId(req.body.id)){
         res.send(`Must include an id, ${req.body.id} is not an id.`);
         return 0;
@@ -358,6 +366,18 @@ app.get('/DeleteOrderItems/:id', (req, res) =>{
         res.send(result);
     });
 });
+
+app.get('/QuickDbDropCreate', (req, res) =>{
+    const dropQuery = `drop database ${dbName}`;
+    const createQuery = `create database ${dbName}`;
+    con.query(dropQuery, (err, result) =>{
+        if(err) throw err;
+        con.query(createQuery, (err, result) =>{
+            if(err) throw err;
+            res.send(result);
+        })
+    })
+})
 
 async function selectByIdQuery(tableName, id){
     const selectQuery = `select * from ${tableName} where id=${id};`;

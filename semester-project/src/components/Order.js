@@ -1,30 +1,89 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Order = () => {
     var api = 'http://localhost:8080/';
-    var [data, setData] = useState([]);
-    useEffect(() =>{
-        axios.get(api+'GetAllProducts')
-        .then(response =>{
-            setData(response.data);
-        })
-        .catch(err =>{
-            console.log("GetAllProducts Failed\n"+err);
-        });
-    }, []);
-    console.log(data);
-    useEffect(() =>{
-        axios.get(api+'PostOrders')
-        .then(response =>{
-            setData(response.data);
-        })
-        .catch(err =>{
-            console.log("PostOrders Failed\n"+err);
-        });
-    });
-    console.log(data);
+    var total = 0.0;
+    var itemsEffected = new Map([]);
+    const navigate = useNavigate();
+    const fetchProducts = async() =>{
+        console.log("Products!");
+        try{
+            const response = await axios.get(api+'GetAllProducts');
+            return response.data;
+        } catch(e){
+            console.log("GetAllProducts Failed\n"+e);
+        }
+        
+    }
+    const postOrders = async(products) =>{
+        console.log("Orders!");
+        
+        if(products == undefined || products.length == 0){
+            console.log("Products undefined")
+            return;
+        }
+        products.forEach(item =>{
+            var amount = parseInt(localStorage.getItem(item.id));
+            if(!isNaN(amount) && amount > 0){
+                total += parseFloat(item.price) * amount;
+                itemsEffected.set(item.id, amount)
+            }
 
+        });
+        var returnInfo = {
+            total: total
+        }
+        try{
+            const response = await axios.post(api+'PostOrders', returnInfo);
+            return response;
+        } catch(e){
+            console.log("PostOrders Failed\n"+e);
+        }
+    }
+    const postOrderItems = async(orderId) =>{
+        console.log("OrderItems!");
+        await itemsEffected.forEach((key, value)=>{
+            var returnInfo ={
+                itemId: key,
+                amount: value,
+                orderId: orderId
+            }
+            axios.post(api+'PostOrderItems', returnInfo)
+            .then(response =>{
+                return response;
+            })
+            .catch(err =>{
+                console.log("PostOrders Failed\n"+err);
+            });
+        });
+    }
+
+    useEffect(() =>{
+        console.log("UseEffect!");
+        const fetchData = async () =>{
+            console.log("fetchData!");
+            try{
+                //the async function need to return into a variable otherwise it will just skip over it... for some reason
+                //curse you chat-gpt
+                var products = await fetchProducts();
+                console.log(products);
+                var orders = await postOrders(products);
+                console.log(orders.data.insertId);
+                var OrderItems = await postOrderItems(orders.data.insertId);
+
+                const timeout = setTimeout(() => {
+                    navigate('/');
+                }, 2000); 
+                return () => clearTimeout(timeout);
+            }catch(err){
+                console.log(err);
+            }
+        }
+        fetchData();
+    }, []);
     
+
 }
 export default Order;
