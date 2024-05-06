@@ -59,6 +59,25 @@ const Order = () => {
             });
         });
     }
+    const patchProducts = async(products) =>{
+        console.log("patchProducts!");
+        
+        await itemsEffected.forEach((value, key) =>{
+            var productsAmount = products[key] + value;
+            var returnInfo ={
+                id: key,
+                amount: productsAmount
+            }
+            axios.post(api+'PatchProducts', returnInfo)
+            .then(response =>{
+                return response;
+            })
+            .catch(e =>{
+                console.log("patchProducts Failed\n"+e)
+            })
+            
+        })
+    }
 
     useEffect(() =>{
         console.log("UseEffect!");
@@ -73,6 +92,8 @@ const Order = () => {
                 console.log(orders.data.insertId);
                 var OrderItems = await postOrderItems(orders.data.insertId);
 
+                var patchProductsRes = await patchProducts(products);
+                
                 const timeout = setTimeout(() => {
                     navigate('/');
                 }, 2000); 
